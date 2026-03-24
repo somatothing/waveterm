@@ -1,0 +1,295 @@
+// Copyright 2026, Command Line Inc.
+// SPDX-License-Identifier: Apache-2.0
+
+.finstream-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    font-size: 12px;
+    gap: 8px;
+
+    --finstream-line-color: var(--accent-color, #4a9eff);
+    --finstream-range-fill: var(--accent-color, #4a9eff);
+
+    // ── toolbar ──────────────────────────────────────────────────────────────
+    .fin-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+
+        .fin-symbol-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            flex: 1 1 auto;
+        }
+
+        .fin-toolbar-actions {
+            display: flex;
+            gap: 4px;
+        }
+    }
+
+    .fin-pill {
+        padding: 3px 8px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color, #444);
+        background: transparent;
+        color: var(--secondary-text-color, #aaa);
+        cursor: pointer;
+        font-size: 11px;
+        white-space: nowrap;
+
+        &:hover {
+            background: var(--highlight-bg, rgba(255, 255, 255, 0.08));
+            color: var(--main-text-color, #fff);
+        }
+
+        &.active {
+            background: var(--accent-color, #4a9eff);
+            border-color: var(--accent-color, #4a9eff);
+            color: #fff;
+        }
+    }
+
+    // ── error ─────────────────────────────────────────────────────────────
+    .fin-error {
+        color: var(--error-color, #f66);
+        font-size: 11px;
+        padding: 4px 8px;
+        background: rgba(255, 80, 80, 0.1);
+        border-radius: 4px;
+    }
+
+    // ── market header ─────────────────────────────────────────────────────
+    .fin-market-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border-color, #333);
+        flex-wrap: wrap;
+
+        .fin-coin {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--main-text-color, #fff);
+            min-width: 40px;
+        }
+
+        .fin-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--main-text-color, #fff);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .fin-change {
+            font-size: 13px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+
+            &.up {
+                color: var(--finstream-up-color, #4caf72);
+            }
+
+            &.down {
+                color: var(--finstream-down-color, #e05252);
+            }
+        }
+
+        .fin-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+
+            .fin-stat-label {
+                font-size: 10px;
+                color: var(--secondary-text-color, #888);
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+
+            .fin-stat-value {
+                font-size: 12px;
+                color: var(--main-text-color, #ddd);
+                font-variant-numeric: tabular-nums;
+            }
+        }
+    }
+
+    // ── chart ─────────────────────────────────────────────────────────────
+    .fin-chart {
+        width: 100%;
+        min-height: 160px;
+        overflow: hidden;
+
+        svg {
+            max-width: 100%;
+        }
+    }
+
+    // ── bottom row ────────────────────────────────────────────────────────
+    .fin-bottom-row {
+        display: flex;
+        gap: 8px;
+        min-height: 220px;
+        flex: 1 0 auto;
+
+        > * {
+            flex: 1 1 50%;
+            min-width: 0;
+        }
+    }
+
+    // ── order book ────────────────────────────────────────────────────────
+    .fin-orderbook {
+        border: 1px solid var(--border-color, #333);
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        .fin-ob-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 6px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--secondary-text-color, #888);
+            background: var(--panel-bg, rgba(255, 255, 255, 0.03));
+            border-bottom: 1px solid var(--border-color, #333);
+        }
+
+        .fin-ob-empty {
+            padding: 12px;
+            color: var(--secondary-text-color, #888);
+            font-size: 11px;
+        }
+
+        .fin-ob-side {
+            &.ask .fin-ob-row {
+                flex-direction: row-reverse;
+
+                .fin-ob-px {
+                    color: var(--finstream-down-color, #e05252);
+                }
+            }
+
+            &.bid .fin-ob-px {
+                color: var(--finstream-up-color, #4caf72);
+            }
+        }
+
+        .fin-ob-spread {
+            text-align: center;
+            padding: 2px;
+            font-size: 10px;
+            color: var(--secondary-text-color, #888);
+            background: var(--panel-bg, rgba(255, 255, 255, 0.03));
+            border-top: 1px solid var(--border-color, #333);
+            border-bottom: 1px solid var(--border-color, #333);
+        }
+
+        .fin-ob-row {
+            display: flex;
+            align-items: center;
+            padding: 1px 6px;
+            position: relative;
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+
+            .fin-ob-bar-bg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+
+                .fin-ob-bar {
+                    height: 100%;
+
+                    &.bid {
+                        background: rgba(76, 175, 114, 0.12);
+                        margin-left: auto;
+                    }
+
+                    &.ask {
+                        background: rgba(224, 82, 82, 0.12);
+                    }
+                }
+            }
+
+            .fin-ob-px {
+                flex: 1;
+                z-index: 1;
+            }
+
+            .fin-ob-sz {
+                color: var(--secondary-text-color, #aaa);
+                z-index: 1;
+                text-align: right;
+                min-width: 50px;
+            }
+        }
+    }
+
+    // ── recent trades ─────────────────────────────────────────────────────
+    .fin-trades {
+        border: 1px solid var(--border-color, #333);
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        .fin-trades-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 6px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--secondary-text-color, #888);
+            background: var(--panel-bg, rgba(255, 255, 255, 0.03));
+            border-bottom: 1px solid var(--border-color, #333);
+        }
+
+        .fin-trades-list {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .fin-trade-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+
+            &.buy .fin-trade-px {
+                color: var(--finstream-up-color, #4caf72);
+            }
+
+            &.sell .fin-trade-px {
+                color: var(--finstream-down-color, #e05252);
+            }
+
+            .fin-trade-sz {
+                color: var(--secondary-text-color, #aaa);
+            }
+
+            .fin-trade-time {
+                color: var(--secondary-text-color, #888);
+                min-width: 56px;
+                text-align: right;
+            }
+        }
+    }
+}

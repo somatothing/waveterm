@@ -180,6 +180,22 @@ type SettingsType struct {
 	TsunamiSdkReplacePath string `json:"tsunami:sdkreplacepath,omitempty"`
 	TsunamiSdkVersion     string `json:"tsunami:sdkversion,omitempty"`
 	TsunamiGoPath         string `json:"tsunami:gopath,omitempty"`
+
+	// Financial Solutions System settings
+	FinstreamClear          bool   `json:"finstream:*,omitempty"`
+	FinstreamDefaultSymbol  string `json:"finstream:defaultsymbol,omitempty"`
+	FinstreamRefreshMs      *int64 `json:"finstream:refreshms,omitempty"`
+	FinstreamApiUrl         string `json:"finstream:apiurl,omitempty"`
+	FinstreamAutoRefresh    *bool  `json:"finstream:autorefresh,omitempty"`
+
+	PortfolioClear         bool   `json:"portfolio:*,omitempty"`
+	PortfolioDefaultWallet string `json:"portfolio:defaultwallet,omitempty"`
+	PortfolioApiUrl        string `json:"portfolio:apiurl,omitempty"`
+	PortfolioRefreshMs     *int64 `json:"portfolio:refreshms,omitempty"`
+
+	GroqClear    bool   `json:"groq:*,omitempty"`
+	GroqApiToken string `json:"groq:apitoken,omitempty"`
+	GroqModel    string `json:"groq:model,omitempty"`
 }
 
 func (s *SettingsType) GetAiSettings() *AiSettingsType {

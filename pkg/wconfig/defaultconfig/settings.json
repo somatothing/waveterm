@@ -38,5 +38,12 @@
     "term:durable": false,
     "waveai:showcloudmodes": true,
     "waveai:defaultmode": "waveai@balanced",
-    "preview:defaultsort": "name"
+    "preview:defaultsort": "name",
+    "finstream:defaultsymbol": "BTC",
+    "finstream:refreshms": 5000,
+    "finstream:apiurl": "https://api.hyperliquid.xyz/info",
+    "finstream:autorefresh": true,
+    "portfolio:apiurl": "https://api.hyperliquid.xyz/info",
+    "portfolio:refreshms": 10000,
+    "groq:model": "llama3-70b-8192"
 }

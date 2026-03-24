@@ -42,6 +42,12 @@ export function blockViewToIcon(view: string): string {
     if (view == "tips") {
         return "lightbulb";
     }
+    if (view == "finstream") {
+        return "chart-line";
+    }
+    if (view == "portfolio") {
+        return "wallet";
+    }
     return "square";
 }
 
@@ -66,6 +72,12 @@ export function blockViewToName(view: string): string {
     }
     if (view == "tips") {
         return "Tips";
+    }
+    if (view == "finstream") {
+        return "FinStream";
+    }
+    if (view == "portfolio") {
+        return "Portfolio";
     }
     return view;
 }

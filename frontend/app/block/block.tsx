@@ -12,7 +12,9 @@ import {
 import type { TabModel } from "@/app/store/tab-model";
 import { useTabModel } from "@/app/store/tab-model";
 import { AiFileDiffViewModel } from "@/app/view/aifilediff/aifilediff";
+import { FinstreamViewModel } from "@/app/view/finstream/finstream-model";
 import { LauncherViewModel } from "@/app/view/launcher/launcher";
+import { PortfolioViewModel } from "@/app/view/portfolio/portfolio-model";
 import { PreviewModel } from "@/app/view/preview/preview-model";
 import { SysinfoViewModel } from "@/app/view/sysinfo/sysinfo";
 import { TsunamiViewModel } from "@/app/view/tsunami/tsunami";
@@ -54,6 +56,8 @@ BlockRegistry.set("launcher", LauncherViewModel);
 BlockRegistry.set("tsunami", TsunamiViewModel);
 BlockRegistry.set("aifilediff", AiFileDiffViewModel);
 BlockRegistry.set("waveconfig", WaveConfigViewModel);
+BlockRegistry.set("finstream", FinstreamViewModel);
+BlockRegistry.set("portfolio", PortfolioViewModel);
 
 function makeViewModel(
     blockId: string,

@@ -129,5 +129,20 @@ const (
 	ConfigKey_TsunamiSdkReplacePath          = "tsunami:sdkreplacepath"
 	ConfigKey_TsunamiSdkVersion              = "tsunami:sdkversion"
 	ConfigKey_TsunamiGoPath                  = "tsunami:gopath"
+
+	ConfigKey_FinstreamClear                 = "finstream:*"
+	ConfigKey_FinstreamDefaultSymbol         = "finstream:defaultsymbol"
+	ConfigKey_FinstreamRefreshMs             = "finstream:refreshms"
+	ConfigKey_FinstreamApiUrl                = "finstream:apiurl"
+	ConfigKey_FinstreamAutoRefresh           = "finstream:autorefresh"
+
+	ConfigKey_PortfolioClear                 = "portfolio:*"
+	ConfigKey_PortfolioDefaultWallet         = "portfolio:defaultwallet"
+	ConfigKey_PortfolioApiUrl                = "portfolio:apiurl"
+	ConfigKey_PortfolioRefreshMs             = "portfolio:refreshms"
+
+	ConfigKey_GroqClear                      = "groq:*"
+	ConfigKey_GroqApiToken                   = "groq:apitoken"
+	ConfigKey_GroqModel                      = "groq:model"
 )
 

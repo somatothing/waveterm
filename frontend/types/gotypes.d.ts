@@ -1429,6 +1429,18 @@ declare global {
         "tsunami:sdkreplacepath"?: string;
         "tsunami:sdkversion"?: string;
         "tsunami:gopath"?: string;
+        "finstream:*"?: boolean;
+        "finstream:defaultsymbol"?: string;
+        "finstream:refreshms"?: number;
+        "finstream:apiurl"?: string;
+        "finstream:autorefresh"?: boolean;
+        "portfolio:*"?: boolean;
+        "portfolio:defaultwallet"?: string;
+        "portfolio:apiurl"?: string;
+        "portfolio:refreshms"?: number;
+        "groq:*"?: boolean;
+        "groq:apitoken"?: string;
+        "groq:model"?: string;
     };
 
     // waveobj.StickerClickOptsType
