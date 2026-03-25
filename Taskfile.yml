@@ -654,3 +654,40 @@ tasks:
         desc: Start the Go documentation server for the tsunami module
         cmd: $(go env GOPATH)/bin/pkgsite -http=:6060
         dir: tsunami
+
+    # ── Financial Solutions System ─────────────────────────────────────────────
+
+    fin:infra:up:
+        desc: Start Financial Solutions infrastructure (PostgreSQL + Redis)
+        cmds:
+            - docker compose -f docker-compose.fin.yml up -d
+            - echo "PostgreSQL ready at localhost:5432  (db: finstream / user: finstream)"
+            - echo "Redis       ready at localhost:6379"
+            - echo "Adminer UI  ready at http://localhost:8080"
+            - echo "RedisInsight ready at http://localhost:8001"
+
+    fin:infra:down:
+        desc: Stop Financial Solutions infrastructure
+        cmds:
+            - docker compose -f docker-compose.fin.yml down
+
+    fin:infra:reset:
+        desc: DESTRUCTIVE – Stop infrastructure and remove all volumes
+        prompt: This will delete all financial data. Are you sure?
+        cmds:
+            - docker compose -f docker-compose.fin.yml down -v
+
+    fin:infra:logs:
+        desc: Tail logs for all Financial Solutions infrastructure services
+        cmds:
+            - docker compose -f docker-compose.fin.yml logs -f
+
+    fin:psql:
+        desc: Open a psql shell to the local Financial Solutions Postgres instance
+        cmds:
+            - docker exec -it waveterm-fin-postgres psql -U finstream -d finstream
+
+    fin:redis:
+        desc: Open a redis-cli shell to the local Financial Solutions Redis instance
+        cmds:
+            - docker exec -it waveterm-fin-redis redis-cli

@@ -16,5 +16,27 @@
         "ai:model": "gpt-5-mini",
         "ai:maxtokens": 4000,
         "ai:timeoutms": 60000
+    },
+    "ai@groq-llama3-70b": {
+        "display:name": "GROQ – Llama 3 70B",
+        "display:order": 10,
+        "ai:*": true,
+        "ai:apitype": "openai",
+        "ai:baseurl": "https://api.groq.com/openai/v1",
+        "ai:model": "llama3-70b-8192",
+        "ai:maxtokens": 8192,
+        "ai:timeoutms": 30000,
+        "ai:name": "GROQ Llama3-70B"
+    },
+    "ai@groq-mixtral": {
+        "display:name": "GROQ – Mixtral 8x7B",
+        "display:order": 11,
+        "ai:*": true,
+        "ai:apitype": "openai",
+        "ai:baseurl": "https://api.groq.com/openai/v1",
+        "ai:model": "mixtral-8x7b-32768",
+        "ai:maxtokens": 32768,
+        "ai:timeoutms": 30000,
+        "ai:name": "GROQ Mixtral"
     }
 }

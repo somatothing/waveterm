@@ -1,0 +1,89 @@
+# Wave Terminal – Financial Solutions System Infrastructure
+# PostgreSQL + Redis stack for local development
+#
+# Usage:
+#   docker compose up -d          # Start all services
+#   docker compose down           # Stop all services
+#   docker compose down -v        # Stop and remove volumes (destructive)
+#
+# Services:
+#   postgres  – primary relational store (market data, trades, positions, ML features)
+#   redis     – cache, pub/sub bus, rate-limiter, session store
+#   adminer   – lightweight web UI for Postgres (http://localhost:8080)
+#   redis-ui  – RedisInsight web UI (http://localhost:8001)
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: waveterm-fin-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: finstream
+      POSTGRES_USER: finstream
+      POSTGRES_PASSWORD: finstream_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/fin-migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finstream -d finstream"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: waveterm-fin-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfilename "redis-aof.aof"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ── Adminer (Postgres web UI) ────────────────────────────────────────────────
+  adminer:
+    image: adminer:latest
+    container_name: waveterm-fin-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── RedisInsight (Redis web UI) ───────────────────────────────────────────────
+  redis-ui:
+    image: redis/redisinsight:latest
+    container_name: waveterm-fin-redisinsight
+    restart: unless-stopped
+    ports:
+      - "8001:5540"
+    volumes:
+      - redisinsight_data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  redisinsight_data:
+    driver: local

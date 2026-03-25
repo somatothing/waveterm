@@ -345,6 +345,42 @@
         },
         "tsunami:gopath": {
           "type": "string"
+        },
+        "finstream:*": {
+          "type": "boolean"
+        },
+        "finstream:defaultsymbol": {
+          "type": "string"
+        },
+        "finstream:refreshms": {
+          "type": "integer"
+        },
+        "finstream:apiurl": {
+          "type": "string"
+        },
+        "finstream:autorefresh": {
+          "type": "boolean"
+        },
+        "portfolio:*": {
+          "type": "boolean"
+        },
+        "portfolio:defaultwallet": {
+          "type": "string"
+        },
+        "portfolio:apiurl": {
+          "type": "string"
+        },
+        "portfolio:refreshms": {
+          "type": "integer"
+        },
+        "groq:*": {
+          "type": "boolean"
+        },
+        "groq:apitoken": {
+          "type": "string"
+        },
+        "groq:model": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
