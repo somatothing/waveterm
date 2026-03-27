@@ -205,7 +205,7 @@ function LogsTab({ model }: { model: ContainerManagerViewModel }) {
                 <button className="containers-widget__btn" onClick={() => model.clearLogs()}>
                     Clear
                 </button>
-                <button className="containers-widget__btn">Download</button>
+                <button className="containers-widget__btn" onClick={() => model.downloadLogs()}>Download</button>
                 <span className="containers-widget__line-count">{logLines.length} lines</span>
             </div>
 

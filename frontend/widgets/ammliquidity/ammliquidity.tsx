@@ -163,8 +163,8 @@ function PositionsTab({ model }: { model: AmmLiquidityViewModel }) {
                             </div>
                         </div>
                         <div className="pos-actions">
-                            <button className="pos-action-btn collect">Collect Fees</button>
-                            <button className="pos-action-btn remove">Remove Liquidity</button>
+                            <button className="pos-action-btn collect" onClick={() => model.collectFees(pos.poolId)}>Collect Fees</button>
+                            <button className="pos-action-btn remove" onClick={() => model.removeLiquidity(pos.poolId)}>Remove Liquidity</button>
                         </div>
                     </div>
                 );
@@ -260,7 +260,7 @@ function SwapTab({ model }: { model: AmmLiquidityViewModel }) {
                                 </div>
                             )}
 
-                            <button className="swap-execute-btn">Swap {inputToken} → {inputToken === pool.token0 ? pool.token1 : pool.token0}</button>
+                            <button className="swap-execute-btn" onClick={() => model.executeSwap()}>Swap {inputToken} → {inputToken === pool.token0 ? pool.token1 : pool.token0}</button>
                         </>
                     )}
                 </div>
@@ -359,7 +359,7 @@ function AddLiquidityTab({ model }: { model: AmmLiquidityViewModel }) {
                                 </div>
                             )}
 
-                            <button className="add-liquidity-btn">Add Liquidity</button>
+                            <button className="add-liquidity-btn" onClick={() => model.addLiquidity()}>Add Liquidity</button>
                         </>
                     )}
                 </div>
@@ -370,6 +370,7 @@ function AddLiquidityTab({ model }: { model: AmmLiquidityViewModel }) {
 
 export const AmmLiquidity: React.FC<ViewComponentProps<AmmLiquidityViewModel>> = ({ model }) => {
     const [activeTab, setActiveTab] = useAtom(model.activeTab);
+    const actionStatus = useAtomValue(model.actionStatus);
 
     const tabs = [
         { id: "pools" as const, label: "Pools" },
@@ -387,6 +388,7 @@ export const AmmLiquidity: React.FC<ViewComponentProps<AmmLiquidityViewModel>> =
                     <span className="widget-subtitle">Uniswap V3 • Camelot • Curve • Balancer</span>
                 </div>
             </div>
+            {actionStatus && <div className="amm-action-status">{actionStatus}</div>}
             <div className="widget-tabs">
                 {tabs.map((tab) => (
                     <button

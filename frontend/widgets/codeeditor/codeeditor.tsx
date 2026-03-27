@@ -188,9 +188,9 @@ function AiTab({ model }: { model: CodeEditorViewModel }) {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Describe the code you want to generate…"
-                        onKeyDown={(e) => e.key === "Enter" && setPrompt("")}
+                        onKeyDown={(e) => { if (e.key === "Enter") { void model.generateCode(prompt); setPrompt(""); } }}
                     />
-                    <button className="code-editor-widget__btn code-editor-widget__btn--primary" onClick={() => setPrompt("")}>
+                    <button className="code-editor-widget__btn code-editor-widget__btn--primary" onClick={() => { void model.generateCode(prompt); setPrompt(""); }}>
                         Generate
                     </button>
                 </div>

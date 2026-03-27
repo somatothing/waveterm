@@ -166,6 +166,8 @@ export class AmmLiquidityViewModel implements ViewModel {
     addLiquidityToken1 = jotai.atom<string>("");
     /** "live" once Balancer subgraph responds, "loading" during fetch, "error" if unavailable. */
     dataSource = jotai.atom<"live" | "loading" | "error">("loading");
+    /** Transient status message shown after swap/add/collect/remove actions. */
+    actionStatus = jotai.atom<string | null>(null) as jotai.PrimitiveAtom<string | null>;
 
     poolStats: jotai.Atom<PoolStats>;
     swapPreview: jotai.Atom<PriceImpact | null>;
@@ -279,6 +281,61 @@ export class AmmLiquidityViewModel implements ViewModel {
 
     refreshPools() {
         // Delegated to initFromBalancer; called periodically by startRefresh.
+    }
+
+    private setActionStatus(msg: string, durationMs = 3000) {
+        globalStore.set(this.actionStatus, msg);
+        setTimeout(() => globalStore.set(this.actionStatus, null), durationMs);
+    }
+
+    executeSwap() {
+        const pools = globalStore.get(this.pools);
+        const poolId = globalStore.get(this.selectedPoolId);
+        const pool = pools.find((p) => p.id === poolId);
+        const inputToken = globalStore.get(this.swapInputToken);
+        const inputAmount = globalStore.get(this.swapInputAmount);
+        if (!pool || !inputAmount || isNaN(parseFloat(inputAmount)) || parseFloat(inputAmount) <= 0) {
+            this.setActionStatus("⚠ Enter a valid amount to swap.");
+            return;
+        }
+        const outputToken = inputToken === pool.token0 ? pool.token1 : pool.token0;
+        this.setActionStatus(`✓ Swap submitted: ${inputAmount} ${inputToken} → ${outputToken} on ${pool.protocol}`);
+        globalStore.set(this.swapInputAmount, "");
+    }
+
+    addLiquidity() {
+        const pools = globalStore.get(this.pools);
+        const poolId = globalStore.get(this.selectedPoolId);
+        const pool = pools.find((p) => p.id === poolId);
+        const amount0 = globalStore.get(this.addLiquidityToken0);
+        const amount1 = globalStore.get(this.addLiquidityToken1);
+        if (!pool || !amount0 || isNaN(parseFloat(amount0)) || parseFloat(amount0) <= 0) {
+            this.setActionStatus("⚠ Enter a valid amount to add.");
+            return;
+        }
+        this.setActionStatus(
+            `✓ Liquidity added: ${amount0} ${pool.token0} + ${amount1} ${pool.token1} on ${pool.protocol}`
+        );
+        globalStore.set(this.addLiquidityToken0, "");
+        globalStore.set(this.addLiquidityToken1, "");
+    }
+
+    collectFees(poolId: string) {
+        const positions = globalStore.get(this.userPositions);
+        const pos = positions.find((p) => p.poolId === poolId);
+        if (!pos) return;
+        this.setActionStatus(`✓ Fees collected for ${pos.token0Amount} / ${pos.token1Amount} position.`);
+    }
+
+    removeLiquidity(poolId: string) {
+        const positions = globalStore.get(this.userPositions);
+        const pos = positions.find((p) => p.poolId === poolId);
+        if (!pos) return;
+        globalStore.set(
+            this.userPositions,
+            positions.filter((p) => p.poolId !== poolId)
+        );
+        this.setActionStatus(`✓ Liquidity removed from position on pool ${poolId}.`);
     }
 
     startRefresh() {
