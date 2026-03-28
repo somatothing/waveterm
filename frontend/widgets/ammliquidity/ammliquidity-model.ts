@@ -174,6 +174,7 @@ export class AmmLiquidityViewModel implements ViewModel {
     viewText: jotai.Atom<HeaderElem[]>;
 
     private refreshInterval: ReturnType<typeof setInterval> | null = null;
+    private actionStatusTimer: ReturnType<typeof setTimeout> | null = null;
 
     constructor({ blockId }: ViewModelInitType) {
         this.blockId = blockId;
@@ -284,8 +285,14 @@ export class AmmLiquidityViewModel implements ViewModel {
     }
 
     private setActionStatus(msg: string, durationMs = 3000) {
+        if (this.actionStatusTimer != null) {
+            clearTimeout(this.actionStatusTimer);
+        }
         globalStore.set(this.actionStatus, msg);
-        setTimeout(() => globalStore.set(this.actionStatus, null), durationMs);
+        this.actionStatusTimer = setTimeout(() => {
+            globalStore.set(this.actionStatus, null);
+            this.actionStatusTimer = null;
+        }, durationMs);
     }
 
     executeSwap() {
@@ -307,14 +314,24 @@ export class AmmLiquidityViewModel implements ViewModel {
         const pools = globalStore.get(this.pools);
         const poolId = globalStore.get(this.selectedPoolId);
         const pool = pools.find((p) => p.id === poolId);
-        const amount0 = globalStore.get(this.addLiquidityToken0);
-        const amount1 = globalStore.get(this.addLiquidityToken1);
-        if (!pool || !amount0 || isNaN(parseFloat(amount0)) || parseFloat(amount0) <= 0) {
-            this.setActionStatus("⚠ Enter a valid amount to add.");
+        const amount0Str = globalStore.get(this.addLiquidityToken0);
+        const amount1Str = globalStore.get(this.addLiquidityToken1);
+        const amount0 = parseFloat(amount0Str);
+        const amount1 = parseFloat(amount1Str);
+        if (
+            !pool ||
+            !amount0Str ||
+            !amount1Str ||
+            isNaN(amount0) ||
+            isNaN(amount1) ||
+            amount0 <= 0 ||
+            amount1 <= 0
+        ) {
+            this.setActionStatus("⚠ Enter valid amounts for both tokens.");
             return;
         }
         this.setActionStatus(
-            `✓ Liquidity added: ${amount0} ${pool.token0} + ${amount1} ${pool.token1} on ${pool.protocol}`
+            `✓ Liquidity added: ${amount0Str} ${pool.token0} + ${amount1Str} ${pool.token1} on ${pool.protocol}`
         );
         globalStore.set(this.addLiquidityToken0, "");
         globalStore.set(this.addLiquidityToken1, "");
@@ -324,7 +341,14 @@ export class AmmLiquidityViewModel implements ViewModel {
         const positions = globalStore.get(this.userPositions);
         const pos = positions.find((p) => p.poolId === poolId);
         if (!pos) return;
-        this.setActionStatus(`✓ Fees collected for ${pos.token0Amount} / ${pos.token1Amount} position.`);
+        const collected = pos.feesEarned;
+        globalStore.set(
+            this.userPositions,
+            positions.map((p) => (p.poolId === poolId ? { ...p, feesEarned: 0 } : p))
+        );
+        this.setActionStatus(
+            `✓ Collected $${collected.toFixed(2)} in fees from ${pos.token0Amount} / ${pos.token1Amount} position.`
+        );
     }
 
     removeLiquidity(poolId: string) {
@@ -349,6 +373,10 @@ export class AmmLiquidityViewModel implements ViewModel {
         if (this.refreshInterval != null) {
             clearInterval(this.refreshInterval);
             this.refreshInterval = null;
+        }
+        if (this.actionStatusTimer != null) {
+            clearTimeout(this.actionStatusTimer);
+            this.actionStatusTimer = null;
         }
     }
 

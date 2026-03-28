@@ -55,7 +55,7 @@ const MAX_CONTEXT_CHARS = 1500;
 
 async function fetchAiSuggestions(code: string, language: Language): Promise<AiSuggestion[]> {
     try {
-        const prompt = `The user is editing ${language} code. Suggest 3-5 improvements, additions, or completions.\n\nCode:\n${code.slice(0, 2000)}`;
+        const prompt = `The user is editing ${language} code. Suggest 3-5 improvements, additions, or completions.\n\nCode:\n${code.slice(0, MAX_CONTEXT_CHARS)}`;
         const request: WaveAIStreamRequest = {
             opts: { model: null, apitoken: null, timeoutms: 30000 },
             prompt: [
@@ -249,8 +249,19 @@ export class CodeEditorViewModel implements ViewModel {
             };
             const gen = RpcApi.StreamWaveAiCommand(TabRpcClient, request, { timeout: 30000 });
             let fullText = "";
+            let hadError = false;
             for await (const packet of gen) {
-                if (packet.text) fullText += packet.text;
+                if (packet.error) {
+                    globalStore.set(this.output, `[Generate Error] ${packet.error}`);
+                    hadError = true;
+                    break;
+                }
+                if (packet.text) {
+                    fullText += packet.text;
+                }
+            }
+            if (hadError) {
+                return;
             }
             // Strip markdown code fences if the model wrapped the output
             const cleaned = fullText
