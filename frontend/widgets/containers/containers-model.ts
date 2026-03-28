@@ -300,6 +300,24 @@ export class ContainerManagerViewModel implements ViewModel {
         globalStore.set(this.logLines, []);
     }
 
+    downloadLogs() {
+        const lines = globalStore.get(this.logLines);
+        const containerName = globalStore.get(this.selectedLogContainer) || "container";
+        if (lines.length === 0) return;
+        const text = lines
+            .map((l) => `[${new Date(l.ts).toISOString()}] [${l.level}] ${l.message}`)
+            .join("\n");
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${containerName}-logs.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     startRefresh() {
         this.refreshInterval = setInterval(async () => {
             const isLive = globalStore.get(this.dockerAvailable);

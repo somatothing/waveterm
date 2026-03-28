@@ -50,9 +50,12 @@ Accuracy: 0.8850
 const CODE_SUGGESTION_SYSTEM_PROMPT =
     "You are an expert code assistant. When given code, respond ONLY with a JSON array of suggestion objects. Each object must have: id (string like 'sug-1'), description (short string), code (the code snippet string). Output valid JSON only, no markdown, no explanation.";
 
+/** Maximum characters of existing code sent as context when generating or suggesting code. */
+const MAX_CONTEXT_CHARS = 1500;
+
 async function fetchAiSuggestions(code: string, language: Language): Promise<AiSuggestion[]> {
     try {
-        const prompt = `The user is editing ${language} code. Suggest 3-5 improvements, additions, or completions.\n\nCode:\n${code.slice(0, 2000)}`;
+        const prompt = `The user is editing ${language} code. Suggest 3-5 improvements, additions, or completions.\n\nCode:\n${code.slice(0, MAX_CONTEXT_CHARS)}`;
         const request: WaveAIStreamRequest = {
             opts: { model: null, apitoken: null, timeoutms: 30000 },
             prompt: [
@@ -220,6 +223,60 @@ export class CodeEditorViewModel implements ViewModel {
         const suggestions = await fetchAiSuggestions(code, language);
         globalStore.set(this.aiSuggestions, suggestions);
         globalStore.set(this.dataSource, "live");
+    }
+
+    /** Generate code from a natural-language prompt via WaveAI and replace the editor content. */
+    async generateCode(prompt: string) {
+        if (!prompt.trim()) return;
+        const language = globalStore.get(this.selectedLanguage);
+        const currentCode = globalStore.get(this.code);
+        globalStore.set(this.output, `[Generating] ${language} code from prompt…`);
+        try {
+            const request: WaveAIStreamRequest = {
+                opts: { model: null, apitoken: null, timeoutms: 30000 },
+                prompt: [
+                    {
+                        role: "system",
+                        content: `You are an expert ${language} programmer. Respond ONLY with valid ${language} code (no markdown, no explanation). Generate complete, runnable code.`,
+                    },
+                    {
+                        role: "user",
+                        content: currentCode
+                            ? `Here is the existing code:\n${currentCode.slice(0, MAX_CONTEXT_CHARS)}\n\nTask: ${prompt}`
+                            : prompt,
+                    },
+                ],
+            };
+            const gen = RpcApi.StreamWaveAiCommand(TabRpcClient, request, { timeout: 30000 });
+            let fullText = "";
+            let hadError = false;
+            for await (const packet of gen) {
+                if (packet.error) {
+                    globalStore.set(this.output, `[Generate Error] ${packet.error}`);
+                    hadError = true;
+                    break;
+                }
+                if (packet.text) {
+                    fullText += packet.text;
+                }
+            }
+            if (hadError) {
+                return;
+            }
+            // Strip markdown code fences if the model wrapped the output
+            const cleaned = fullText
+                .replace(/^```(?:\w+)?\n?/gm, "")
+                .replace(/^```\s*$/gm, "")
+                .trim();
+            if (cleaned) {
+                globalStore.set(this.code, cleaned);
+                globalStore.set(this.output, `[Generated] ${language} code from prompt.`);
+            } else {
+                globalStore.set(this.output, "[Generate] No code returned — check AI configuration.");
+            }
+        } catch (err) {
+            globalStore.set(this.output, `[Generate Error] ${(err as Error).message}`);
+        }
     }
 
     stopRun() {
